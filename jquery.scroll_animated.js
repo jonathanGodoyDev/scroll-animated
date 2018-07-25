@@ -54,7 +54,12 @@ $.fn.extend({
             //if the key "animatedDuration" does not exist, duration is "1s"
             if (options.hasOwnProperty("animatedDuration")) {
                 var duration = options["animatedDuration"];
-                _selector.css({"-webkit-animation-duration":duration, "animation-duration":duration});
+                _selector.css({
+                    "-webkit-animation-duration": duration, 
+                    "animation-duration": duration,
+                    "-webkit-animation-fill-mode": "both",
+                    "animation-fill-mode": "both"
+                });
             } else {
                  _selector.addClass("animated");
             }
@@ -81,7 +86,7 @@ $.fn.extend({
                 _animatedClass = options["animatedClass"];
                 setProperties();
 
-                if (_initImediate !== undefined) {
+                if (_initImediate) {
                     _selector.addClass(_animatedClass);
                 } else {
                     onScroll();
@@ -132,7 +137,7 @@ var scrollAnimated = new function(){
             var objOptions = {
                 animatedClass : _selector.attr("data-scroll-class"),
                 rerun         : _rerun,
-                initImediate  : _selector.attr("data-scroll-init") || false
+                initImediate  : _selector.attr("data-scroll-init") === ""
             };
 
             if (_selector.attr("data-scroll-duration")) {
