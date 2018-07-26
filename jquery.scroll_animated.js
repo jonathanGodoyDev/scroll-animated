@@ -73,7 +73,7 @@ $.fn.extend({
                     if (isOnScreen()) {
                         _selector.addClass(_animatedClass);
                     }
-                } else if (_rerun) {
+                } else if (st < _lastScroll && _rerun) {
                     _selector.removeClass(_animatedClass);
                 }
 
