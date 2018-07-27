@@ -51,6 +51,15 @@ $.fn.extend({
                 _initImediate = options["initImediate"];
             }
             
+            //if the key exists and it is true, the animation is executed when the page is loaded 
+            if (options.hasOwnProperty("animateDelay")){
+                var delay = options["animateDelay"];
+                _selector.css({
+                    "-webkit-animation-delay": delay, 
+                    "animation-delay": delay
+                });
+            }
+            
             //if the key "animatedDuration" does not exist, duration is "1s"
             if (options.hasOwnProperty("animatedDuration")) {
                 var duration = options["animatedDuration"];
@@ -142,6 +151,9 @@ var scrollAnimated = new function(){
 
             if (_selector.attr("data-scroll-duration")) {
                 objOptions.animatedDuration = _selector.attr("data-scroll-duration");
+            }
+            if (_selector.attr("data-scroll-delay")) {
+                objOptions.animateDelay = _selector.attr("data-scroll-delay");
             }
 
             //add the scroll animation to the element
