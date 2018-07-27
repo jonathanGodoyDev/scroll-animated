@@ -42,26 +42,21 @@ $.fn.extend({
         
         function setProperties(){
             //if the value "rerun" is true, always execute when scrolling down
-            if (options.hasOwnProperty("rerun") && typeof options["rerun"] === 'boolean') {
-                _rerun = options["rerun"];
-            }
+            _rerun = scrollAnimated.getValueBoolean(options, "rerun", false);
             
-            //if the key exists and it is true, the animation is executed when the page is loaded 
-            if (options.hasOwnProperty("initImediate") && typeof options["initImediate"] === 'boolean'){
-                _initImediate = options["initImediate"];
-            }
+            //if the key exists and it is true, the animation is executed when the page is loaded
+            _initImediate = scrollAnimated.getValueBoolean(options, "initImediate", false);
             
-            //if the key exists and it is true, the animation is executed when the page is loaded 
-            if (options.hasOwnProperty("animateDelay")){
-                var delay = options["animateDelay"];
+            if (options.hasOwnProperty("animatedDelay") && options["animatedDelay"] !== null){
+                var delay = options["animatedDelay"];
                 _selector.css({
                     "-webkit-animation-delay": delay, 
                     "animation-delay": delay
                 });
             }
             
-            //if the key "animatedDuration" does not exist, duration is "1s"
-            if (options.hasOwnProperty("animatedDuration")) {
+            //if the key "animatedDuration" does not exist, duration is "1s" animate.css
+            if (options.hasOwnProperty("animatedDuration") && options["animatedDuration"] !== null) {
                 var duration = options["animatedDuration"];
                 _selector.css({
                     "-webkit-animation-duration": duration, 
@@ -91,7 +86,7 @@ $.fn.extend({
         }
         
         function initialize(){
-            if (options.hasOwnProperty("animatedClass")) {
+            if (options.hasOwnProperty("animatedClass") && options["animatedClass"] !== null) {
                 _animatedClass = options["animatedClass"];
                 setProperties();
 
@@ -128,36 +123,47 @@ $.fn.extend({
  * </html>
  */
 var scrollAnimated = new function(){
+    "use strict";
+    
     function getSelector(selectorClass){
         if (selectorClass.attr("id")) {
             return $("#"+selectorClass.attr("id"));
         } else {
-            var newId = "animated_"+Math.floor(Math.random() * 1000) + 1;
+            var newId = "animated_" + Math.floor(Math.random() * 10000) + 1;
             selectorClass.attr("id", newId);
             return $("#"+newId);
         }
     }
     
-    this.init = function(rerun){
-        var _rerun = rerun || false;
+    function isMobile(){
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    
+    function getAttr(element, name){
+        var attr = element.attr(name);
+        return (attr !== undefined) ? attr : null;
+    }
+    
+    this.getValueBoolean = function(obj, key, defaultValue){
+        return (obj.hasOwnProperty(key) && typeof obj[key] === 'boolean') ? obj[key] : defaultValue;
+    };
+    
+    this.init = function(options){
+        if (!scrollAnimated.getValueBoolean(options, "mobile", true) && isMobile()) {
+            return;
+        }
         
         $(".scroll-animated").each(function(i){
             var _selector = getSelector($(this));           
-            var objOptions = {
-                animatedClass : _selector.attr("data-scroll-class"),
-                rerun         : _rerun,
-                initImediate  : _selector.attr("data-scroll-init") === ""
-            };
-
-            if (_selector.attr("data-scroll-duration")) {
-                objOptions.animatedDuration = _selector.attr("data-scroll-duration");
-            }
-            if (_selector.attr("data-scroll-delay")) {
-                objOptions.animateDelay = _selector.attr("data-scroll-delay");
-            }
 
             //add the scroll animation to the element
-            _selector.scroll_animated(objOptions);
+            _selector.scroll_animated({
+                animatedClass    : getAttr(_selector, "data-scroll-class"),
+                rerun            : scrollAnimated.getValueBoolean(options, "rerun", false),
+                initImediate     : getAttr(_selector, "data-scroll-init") === "true",
+                animatedDuration : getAttr(_selector, "data-scroll-duration"),
+                animatedDelay     : getAttr(_selector, "data-scroll-delay")
+            });
         });
     };
 };
